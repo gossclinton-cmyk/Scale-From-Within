@@ -10,7 +10,322 @@
     --dark:  #1E1E1E;
     --dgray: #3C3C3C;
     --mgray: #7A7A7A;
+    --lgray: #F0F0F0;<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clinton Goss | Scale From Within</title>
+<style>
+  :root {
+    --red:   #B53939;
+    --dark:  #1E1E1E;
+    --dgray: #3C3C3C;
+    --mgray: #7A7A7A;
     --lgray: #F0F0F0;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: var(--dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 16px 60px;
+  }
+
+  /* ─── TOP RED BAR ───────────────────────────── */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--red);
+    z-index: 100;
+  }
+
+  /* ─── CARD CONTAINER ────────────────────────── */
+  .card {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ─── AVATAR ────────────────────────────────── */
+  .avatar-wrap {
+    position: relative;
+    margin-bottom: 16px;
+  }
+  .avatar {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: var(--dgray);
+    border: 3px solid var(--red);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--white);
+    letter-spacing: -1px;
+    overflow: hidden;
+  }
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  /* ─── NAME & BIO ────────────────────────────── */
+  .name {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--white);
+    text-align: center;
+    margin-bottom: 4px;
+    letter-spacing: .02em;
+  }
+  .handle {
+    font-size: .82rem;
+    color: var(--red);
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 10px;
+    letter-spacing: .04em;
+  }
+  .tagline {
+    font-size: .88rem;
+    color: var(--mgray);
+    text-align: center;
+    line-height: 1.55;
+    margin-bottom: 6px;
+    max-width: 340px;
+  }
+  .framework-tag {
+    font-size: .72rem;
+    color: var(--red);
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+
+  /* ─── DIVIDER ───────────────────────────────── */
+  .divider {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .divider-line { flex: 1; height: 1px; background: #333; }
+  .divider-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+
+  /* ─── SECTION LABEL ─────────────────────────── */
+  .section-label {
+    width: 100%;
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--mgray);
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+
+  /* ─── LINK BUTTONS ──────────────────────────── */
+  .links { width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: transform .15s, box-shadow .15s;
+    cursor: pointer;
+    border: none;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.4);
+  }
+  .btn:active { transform: translateY(0); }
+
+  /* Primary (free) */
+  .btn-free {
+    background: #2A2A2A;
+    border: 1.5px solid #3A3A3A;
+  }
+  .btn-free:hover { border-color: var(--red); }
+
+  /* Paid product */
+  .btn-paid {
+    background: var(--red);
+    border: 1.5px solid var(--red);
+  }
+
+  /* Community */
+  .btn-community {
+    background: #1A1A2E;
+    border: 1.5px solid #2A2A4A;
+  }
+  .btn-community:hover { border-color: #6060CC; }
+
+  /* CTA / coaching */
+  .btn-cta {
+    background: transparent;
+    border: 1.5px solid var(--red);
+  }
+
+  .btn-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    background: rgba(255,255,255,.08);
+  }
+
+  .btn-text { flex: 1; }
+  .btn-title {
+    font-size: .92rem;
+    font-weight: 700;
+    color: var(--white);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .btn-sub {
+    font-size: .75rem;
+    color: rgba(255,255,255,.55);
+    display: block;
+  }
+  .btn-paid .btn-sub { color: rgba(255,255,255,.75); }
+
+  .btn-badge {
+    font-size: .72rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    letter-spacing: .02em;
+  }
+  .badge-free { background: rgba(181,57,57,.2); color: var(--red); border: 1px solid var(--red); }
+  .badge-paid { background: rgba(255,255,255,.2); color: var(--white); }
+  .badge-new  { background: #6060CC; color: var(--white); }
+
+  /* ─── FOOTER ────────────────────────────────── */
+  .footer {
+    margin-top: 28px;
+    text-align: center;
+  }
+  .footer p {
+    font-size: .72rem;
+    color: #444;
+    line-height: 1.6;
+  }
+  .footer strong { color: #555; }
+
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<div class="card">
+
+  <!-- Avatar -->
+  <div class="avatar-wrap">
+    <div class="avatar">CG</div>
+  </div>
+
+  <!-- Name & bio -->
+  <div class="name">Clinton Goss</div>
+  <div class="handle">@clintongoss</div>
+  <p class="tagline">Helping business owners master self-leadership to lead better, solve deeper &amp; scale smarter.</p>
+  <div class="framework-tag">The E.L.S. Framework™ &nbsp;·&nbsp; Energy. Leadership. Scale.</div>
+
+  <!-- Free -->
+  <div class="section-label">Start here — free</div>
+  <div class="links">
+    <a href="scorecard_optin.html" class="btn btn-free">
+      <div class="btn-icon">⚡</div>
+      <div class="btn-text">
+        <span class="btn-title">Take the Energy Audit Scorecard</span>
+        <span class="btn-sub">Find out where your energy is really going</span>
+      </div>
+      <span class="btn-badge badge-free">FREE</span>
+    </a>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Paid products -->
+  <div class="section-label">Guides &amp; resources</div>
+  <div class="links">
+    <a href="https://ohstore.mysamcart.com/checkout/the-energy-deficit-fix" class="btn btn-paid">
+      <div class="btn-icon">📖</div>
+      <div class="btn-text">
+        <span class="btn-title">The Energy Deficit Fix</span>
+        <span class="btn-sub">30-day guide + workbook for entrepreneurs running on empty</span>
+      </div>
+      <span class="btn-badge badge-paid">$47</span>
+    </a>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-dot"></div>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Community -->
+  <div class="section-label">Join the community</div>
+  <div class="links">
+    <a href="https://www.skool.com/burn-the-boats-8948/about" class="btn btn-community">
+      <div class="btn-icon">🔥</div>
+      <div class="btn-text">
+        <span class="btn-title">The ELS Collective</span>
+        <span class="btn-sub">90-day program · coaching · community · accountability</span>
+      </div>
+      <span class="btn-badge badge-new">JOIN</span>
+    </a>
+  </div>
+
+
+  <!-- Footer -->
+  <div class="footer">
+    <p><strong>Scale From Within</strong><br>
+    Energy. Leadership. Scale.<br>
+    © 2026 Clinton Goss</p>
+  </div>
+
+</div>
+
+</body>
+</html>
+
     --white: #ffffff;<!DOCTYPE html>
 <html lang="en">
 <head>
