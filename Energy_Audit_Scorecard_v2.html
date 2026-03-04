@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energy Audit Scorecard | Clinton Goss</title>
+<style>
+  :root {
+    --red:    #B53939;
+    --dark:   #1E1E1E;
+    --dgray:  #3C3C3C;
+    --mgray:  #7A7A7A;
+    --lgray:  #F0F0F0;
+    --offwhite: #F7F7F7;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #E8E8E8;
+    color: var(--dark);
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ───────────────────────────────── */
+  header {
+    background: var(--dark);
+    border-bottom: 4px solid var(--red);
+    padding: 30px 24px 22px;
+    text-align: center;
+  }
+  header h1 {
+    color: #fff;
+    font-size: 1.6rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  header .sub  { color: #bbb; font-size: .92rem; margin-bottom: 5px; }
+  header .brand { color: var(--red); font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+  /* ─── PROGRESS TRACKER ─────────────────────── */
+  .tracker {
+    background: var(--dark);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .tracker-bar-wrap { flex: 1; max-width: 320px; background: #333; border-radius: 6px; height: 8px; overflow: hidden; }
+  .tracker-bar { height: 100%; background: var(--red); border-radius: 6px; transition: width .4s; width: 0%; }
+  .tracker-count { color: #bbb; font-size: .8rem; white-space: nowrap; }
+  .tracker-score { color: var(--red); font-weight: 700; font-size: .9rem; white-space: nowrap; }
+
+  /* ─── MAIN ─────────────────────────────────── */
+  main { max-width: 780px; margin: 28px auto; padding: 0 16px 60px; }
+
+  /* ─── INSTRUCTIONS ─────────────────────────── */
+  .instructions {
+    background: var(--red);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 26px;
+    color: #fff;
+  }
+  .instructions strong { display: block; font-size: .85rem; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; }
+  .instructions p { font-size: .88rem; line-height: 1.55; opacity: .92; }
+
+  /* ─── SECTION LABELS ───────────────────────── */
+  .section-label {
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--mgray);
+    margin: 28px 0 12px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--red);
+  }
+
+  /* ─── RATING CARDS ─────────────────────────── */
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 18px 18px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--red);
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    transition: box-shadow .2s;
+  }
+  .card:hover { box-shadow: 0 3px 14px rgba(0,0,0,.11); }
+
+  .card-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+  .card-num {
+    background: var(--dark);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .card-info { flex: 1; }
+  .card-info h3 { font-size: .97rem; color: var(--dark); margin-bottom: 2px; }
+  .card-info p  { font-size: .8rem; color: var(--mgray); }
+  .card-badge {
+    background: var(--lgray);
+    border-radius: 20px;
+    padding: 3px 12px;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--dark);
+    flex-shrink: 0;
+    transition: background .2s, color .2s;
+    min-width: 40px;
+    text-align: center;
+  }
+
+  /* ─── RATING BUTTONS ───────────────────────── */
+  .rating { display: flex; gap: 5px; flex-wrap: wrap; }
+  .rating button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    background: #fff;
+    color: var(--dgray);
+    font-size: .83rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    flex-shrink: 0;
+  }
+  .rating button:hover { border-color: var(--red); color: var(--red); }
+  .rating button.sel { color: #fff; border-color: transparent; transform: scale(1.1); }
+  .rating button.sel.low  { background: #8B0000; }
+  .rating button.sel.mid  { background: #A84A00; }
+  .rating button.sel.high { background: #2E6B35; }
+
+  /* ─── SCORE PANEL ──────────────────────────── */
+  .score-panel {
+    background: var(--dark);
+    border-radius: 10px;
+    padding: 28px 24px;
+    text-align: center;
+    margin: 30px 0 20px;
+    border-top: 4px solid var(--red);
+    box-shadow: 0 4px 20px rgba(0,0,0,.18);
+  }
+  .score-panel .label { color: #999; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .score-big { font-size: 4.2rem; font-weight: 900; color: var(--red); line-height: 1; margin-bottom: 4px; }
+  .score-out { color: #666; font-size: .85rem; margin-bottom: 16px; }
+  .score-bar-wrap { background: #333; border-radius: 6px; height: 10px; margin: 12px 0; overflow: hidden; }
+  .score-bar { height: 100%; background: var(--red); border-radius: 6px; width: 0%; transition: width .5s ease; }
+  .score-tag {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 24px;
+    font-weight: 700;
+    font-size: .98rem;
+    background: #333;
+    color: #888;
+    transition: background .4s, color .3s;
+    margin-bottom: 12px;
+  }
+  .score-desc { color: #aaa; font-size: .87rem; line-height: 1.6; max-width: 520px; margin: 0 auto; }
+
+  /* ─── BREAKDOWN ────────────────────────────── */
+  .breakdown {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+    display: none;
+  }
+  .breakdown h3 {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--mgray);
+    border-bottom: 2px solid var(--red);
+    padding-bottom: 8px;
+    margin-bottom: 14px;
+  }
+  .bd-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .bd-name { width: 180px; font-size: .82rem; color: var(--dark); flex-shrink: 0; }
+  .bd-wrap { flex: 1; background: var(--lgray); border-radius: 4px; height: 10px; overflow: hidden; }
+  .bd-fill { height: 100%; border-radius: 4px; transition: width .5s ease; }
+  .bd-val  { width: 24px; text-align: right; font-size: .82rem; font-weight: 700; color: var(--dark); flex-shrink: 0; }
+
+  /* ─── REFLECTION ───────────────────────────── */
+  .reflection {
+    background: #fff;
+    border-radius: 8px;
+    padding: 22px 22px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.07);
+  }
+  .reflection h3 {
+    font-size: .8rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--mgray);
+    border-bottom: 2px solid var(--red);
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+  }
+  .reflection .intro {
+    font-size: .84rem;
+    color: var(--mgray);
+    margin-bottom: 18px;
+    line-height: 1.5;
+  }
+  .q-block { margin-bottom: 22px; }
+  .q-block .q-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .q-num {
+    background: var(--red);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .q-block h4 { font-size: .9rem; color: var(--dark); line-height: 1.4; }
+  .q-block .q-hint { font-size: .8rem; color: var(--mgray); margin: 4px 0 8px 32px; line-height: 1.4; font-style: italic; }
+  .q-block textarea {
+    width: 100%;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-family: inherit;
+    font-size: .87rem;
+    color: var(--dark);
+    resize: vertical;
+    min-height: 64px;
+    line-height: 1.5;
+    transition: border-color .2s;
+  }
+  .q-block textarea:focus { outline: none; border-color: var(--red); }
+  .q-block textarea::placeholder { color: #ccc; }
+
+  /* ─── CTA ──────────────────────────────────── */
+  .cta {
+    background: var(--dark);
+    border-radius: 10px;
+    border-top: 4px solid var(--red);
+    padding: 28px 24px;
+    text-align: center;
+  }
+  .cta h3 { color: var(--red); font-size: 1.2rem; margin-bottom: 10px; }
+  .cta p  { color: #aaa; font-size: .88rem; line-height: 1.6; margin-bottom: 18px; max-width: 480px; margin-left: auto; margin-right: auto; }
+  .cta a {
+    display: inline-block;
+    background: var(--red);
+    color: #fff;
+    font-weight: 700;
+    font-size: .92rem;
+    padding: 12px 28px;
+    border-radius: 28px;
+    text-decoration: none;
+    transition: background .2s, transform .15s;
+  }
+  .cta a:hover { background: #922e2e; transform: translateY(-1px); }
+
+  footer {
+    background: var(--dark);
+    border-top: 2px solid var(--red);
+    color: #666;
+    text-align: center;
+    padding: 14px;
+    font-size: .75rem;
+  }
+
+  @media (max-width: 520px) {
+    .rating button { width: 36px; height: 36px; font-size: .76rem; }
+    .score-big { font-size: 3rem; }
+    .bd-name { width: 120px; font-size: .76rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>The Energy Audit Scorecard</h1>
+  <p class="sub">Discover where your energy is going — and get it back.</p>
+  <p class="brand">Clinton Goss &nbsp;|&nbsp; Scale From Within &nbsp;|&nbsp; The E.L.S. Framework</p>
+</header>
+
+<div class="tracker">
+  <span class="tracker-count" id="trackerCount">0 of 10 rated</span>
+  <div class="tracker-bar-wrap"><div class="tracker-bar" id="trackerBar"></div></div>
+  <span class="tracker-score" id="trackerScore">Score: 0</span>
+</div>
+
+<main>
+
+  <div class="instructions">
+    <strong>How to use this</strong>
+    <p>Rate each area from <strong>1 to 10</strong> — 1 = completely draining, 10 = completely energizing. Be honest; no one is grading you. Your total score and results update automatically. When you're done scoring, scroll down for your results and reflection prompts.</p>
+  </div>
+
+  <div class="section-label">Part 1 — Rate Your Energy Areas</div>
+  <div id="cards"></div>
+
+  <!-- SCORE PANEL -->
+  <div class="score-panel">
+    <div class="label">Your Total Score</div>
+    <div class="score-big" id="scoreNum">0</div>
+    <div class="score-out">out of 100</div>
+    <div class="score-bar-wrap"><div class="score-bar" id="scoreBar"></div></div>
+    <div class="score-tag" id="scoreTag">Rate all 10 areas to see your result</div>
+    <div class="score-desc" id="scoreDesc">Your result will appear here once all areas are rated.</div>
+  </div>
+
+  <!-- BREAKDOWN -->
+  <div class="breakdown" id="breakdown">
+    <h3>Your Energy Breakdown</h3>
+    <div id="bdRows"></div>
+  </div>
+
+  <!-- REFLECTION -->
+  <div class="section-label">Part 2 — Deep Reflection</div>
+  <div class="reflection">
+    <h3>8 Questions to Go Deeper</h3>
+    <p class="intro">Take 10–15 minutes here. Don't rush. Your answers are often more valuable than your scores — this is where real awareness begins.</p>
+    <div id="questions"></div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">
+    <h3>Ready to go deeper?</h3>
+    <p>The Scale From Within Accelerator is a 90-day program for entrepreneurs ready to master self-leadership, remove bottlenecks, and build a business that scales without burning you out.</p>
+    <a href="https://instagram.com/clintongoss" target="_blank">DM @clintongoss — say "AUDIT"</a>
+  </div>
+
+</main>
+
+<footer>Clinton Goss &nbsp;|&nbsp; Scale From Within &nbsp;|&nbsp; @clintongoss</footer>
+
+<script>
+const CATS = [
+  { title: "Daily Work Tasks",              sub: "Are the things you do every day energizing or draining?" },
+  { title: "Client Work & Communication",   sub: "How do you feel after client interactions?" },
+  { title: "Team & Internal Leadership",    sub: "Does leading your team fill or drain you?" },
+  { title: "Peer & Business Relationships", sub: "Are your professional relationships reciprocal?" },
+  { title: "Personal Relationships",        sub: "Are your family / partner relationships restorative?" },
+  { title: "Friendships Outside Work",      sub: "Do you have people who genuinely fill your cup?" },
+  { title: "Physical Environment",          sub: "Does where you work energize you?" },
+  { title: "Your Offer & Business Model",   sub: "Are you still genuinely excited about what you sell?" },
+  { title: "Daily Habits & Routines",       sub: "Do your habits support or sabotage your energy?" },
+  { title: "Vision & Direction Clarity",    sub: "Do you know clearly where you are headed?" },
+];
+
+const RESULTS = [
+  { min: 85, label: "Energy Rich",    color: "#2E6B35",
+    desc: "You're in a strong place. Your energy is largely aligned with your work and life. A few intentional tweaks will unlock your next level of growth and leadership. Don't mistake comfort for complacency — keep auditing." },
+  { min: 65, label: "Energy Leaking", color: "#A84A00",
+    desc: "You have a solid foundation, but key areas are quietly draining you. Left unchecked, these leaks become the ceiling on your growth. The good news: you're close. Targeted work in your lowest areas will create fast momentum." },
+  { min: 45, label: "Energy Deficit", color: "#8B0000",
+    desc: "Multiple areas are pulling you down, and it's showing up in your decisions, your leadership, and your ability to scale. This isn't a discipline problem — it's a design problem. Your current structure is costing you more than you realize." },
+  { min: 0,  label: "Energy Crisis",  color: "#4A0070",
+    desc: "You're running on empty. No strategy, system, or new hire will fix what's happening here — because the issue is foundational. Real, lasting growth starts from within. The work starts now, and you don't have to do it alone." },
+];
+
+const PROMPTS = [
+  { q: "What patterns do you notice across your lowest scores?",
+    hint: "Are they mostly personal, professional, or both? What does that tell you about where the real drain is coming from?" },
+  { q: "Which area surprised you the most — and why?",
+    hint: "Sometimes the areas we've normalized as 'just how it is' are the ones costing us the most. What have you been tolerating?" },
+  { q: "Where are you giving energy that isn't being returned?",
+    hint: "Think about relationships, commitments, and responsibilities. What are you holding onto that no longer serves you?" },
+  { q: "What would your business look like if your 3 lowest scores were all at an 8+?",
+    hint: "Describe it specifically — how would you lead differently? What decisions would become easier? How would your team feel?" },
+  { q: "Which single area, if improved, would create the most ripple effect across the others?",
+    hint: "Which one change would automatically improve two or three other areas? That's your highest leverage point." },
+  { q: "What is one thing you can do THIS WEEK to improve your lowest score by even 1 point?",
+    hint: "Small, specific, and doable. Write the action — not the intention. What does it look like in practice?" },
+  { q: "Who in your life needs to know where you are right now?",
+    hint: "Real change rarely happens in isolation. Who is your accountability partner, your truth-teller, your support system?" },
+  { q: "What has this scorecard confirmed that you already knew — but haven't acted on yet?",
+    hint: "This is the most important question. Awareness without action is just information. What's the thing you already know?" },
+];
+
+const scores = new Array(CATS.length).fill(0);
+
+function btnClass(n) {
+  return n <= 3 ? "low" : n <= 6 ? "mid" : "high";
+}
+function barColor(n) {
+  return n <= 3 ? "#8B0000" : n <= 6 ? "#A84A00" : "#2E6B35";
+}
+
+// Build rating cards
+function buildCards() {
+  const container = document.getElementById("cards");
+  CATS.forEach((cat, idx) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <div class="card-top">
+        <div class="card-num">${idx + 1}</div>
+        <div class="card-info"><h3>${cat.title}</h3><p>${cat.sub}</p></div>
+        <div class="card-badge" id="badge-${idx}">—</div>
+      </div>
+      <div class="rating" id="rating-${idx}"></div>
+    `;
+    const rDiv = div.querySelector(`#rating-${idx}`);
+    for (let n = 1; n <= 10; n++) {
+      const btn = document.createElement("button");
+      btn.textContent = n;
+      btn.className = btnClass(n);
+      btn.dataset.val = n;
+      btn.addEventListener("click", () => pick(idx, n, div));
+      rDiv.appendChild(btn);
+    }
+    container.appendChild(div);
+  });
+}
+
+// Build reflection questions
+function buildQuestions() {
+  const container = document.getElementById("questions");
+  PROMPTS.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "q-block";
+    div.innerHTML = `
+      <div class="q-header">
+        <div class="q-num">${i + 1}</div>
+        <h4>${p.q}</h4>
+      </div>
+      <p class="q-hint">${p.hint}</p>
+      <textarea placeholder="Write your thoughts here…" rows="3"></textarea>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function pick(idx, val, card) {
+  scores[idx] = val;
+  card.querySelectorAll(".rating button").forEach(b => {
+    b.classList.remove("sel");
+    if (parseInt(b.dataset.val) === val) b.classList.add("sel");
+  });
+  const badge = card.querySelector(`#badge-${idx}`);
+  badge.textContent = val;
+  badge.style.background = barColor(val);
+  badge.style.color = "#fff";
+  update();
+}
+
+function update() {
+  const rated = scores.filter(s => s > 0).length;
+  const total = scores.reduce((a, b) => a + b, 0);
+
+  // Tracker
+  document.getElementById("trackerCount").textContent = `${rated} of 10 rated`;
+  document.getElementById("trackerBar").style.width = (rated / 10 * 100) + "%";
+  document.getElementById("trackerScore").textContent = `Score: ${total}`;
+
+  // Score panel
+  document.getElementById("scoreNum").textContent = total;
+  document.getElementById("scoreBar").style.width = total + "%";
+
+  if (rated < CATS.length) {
+    document.getElementById("scoreTag").textContent = `${rated} of 10 areas rated`;
+    document.getElementById("scoreTag").style.background = "#333";
+    document.getElementById("scoreTag").style.color = "#888";
+    document.getElementById("scoreDesc").textContent = "Keep rating to see your full result.";
+    document.getElementById("breakdown").style.display = "none";
+    return;
+  }
+
+  const res = RESULTS.find(r => total >= r.min);
+  const tag = document.getElementById("scoreTag");
+  tag.textContent = res.label;
+  tag.style.background = res.color;
+  tag.style.color = "#fff";
+  document.getElementById("scoreBar").style.background = res.color;
+  document.getElementById("scoreDesc").textContent = res.desc;
+
+  // Breakdown
+  const bd = document.getElementById("breakdown");
+  bd.style.display = "block";
+  const rows = document.getElementById("bdRows");
+  rows.innerHTML = "";
+  const sorted = CATS.map((c, i) => ({ name: c.title, score: scores[i] }))
+                     .sort((a, b) => a.score - b.score);
+  sorted.forEach(({ name, score }) => {
+    const row = document.createElement("div");
+    row.className = "bd-row";
+    row.innerHTML = `
+      <div class="bd-name">${name}</div>
+      <div class="bd-wrap"><div class="bd-fill" style="width:${score*10}%;background:${barColor(score)}"></div></div>
+      <div class="bd-val">${score}</div>
+    `;
+    rows.appendChild(row);
+  });
+}
+
+buildCards();
+buildQuestions();
+</script>
+</body>
+</html>
